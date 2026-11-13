@@ -28,7 +28,7 @@ main{padding:25px clamp(15px,3vw,40px);max-width:1550px;width:100%;margin:auto;m
 <div class="footer">QUANTORA · Market-data provider: Binance public endpoints · TradingView Lightweight Charts · Read-only educational tool</div>
 </main></div>
 <script>
-const API=location.origin;const $=id=>document.getElementById(id);let chart,candleSeries,volumeSeries,ws=null,portfolio=JSON.parse(localStorage.getItem('q_portfolio')||'{"cash":10000,"positions":{},"history":[]}'),strategies=JSON.parse(localStorage.getItem('q_strategies')||'[]');
+const API="https://quantora-rele.onrender.com";const $=id=>document.getElementById(id);let chart,candleSeries,volumeSeries,ws=null,portfolio=JSON.parse(localStorage.getItem('q_portfolio')||'{"cash":10000,"positions":{},"history":[]}'),strategies=JSON.parse(localStorage.getItem('q_strategies')||'[]');
 function money(v){return Number(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2})}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===id));const titles={overview:'Overview',analysis:'Analysis lab',strategy:'Strategy builder',backtest:'Backtest lab',paper:'Paper portfolio',news:'News & events',assistant:'AI research assistant'};$('title').textContent=titles[id]}
