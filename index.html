@@ -18,4 +18,229 @@
             --border-color: #1f293d;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-main); line-height: 1.
+        body { background-color: var(--bg-base); color: var(--text-main); line-height: 1.5; padding-bottom: 40px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--accent-blue); }
+        .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; background: rgba(14, 203, 129, 0.15); color: var(--accent-green); font-weight: 600; }
+        
+        .container { padding: 15px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Navigation Tabs */
+        .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+
+        /* Cards & Panels */
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 15px; }
+        .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
+
+        /* Controls */
+        .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        select, button { width: 100%; padding: 10px; background: var(--bg-hover); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; }
+        button.primary { background: var(--accent-blue); color: white; border: none; cursor: pointer; }
+        button.primary:active { opacity: 0.8; }
+
+        /* Chart container */
+        #chart-container { width: 100%; height: 350px; border-radius: 8px; overflow: hidden; }
+
+        /* Analysis Terminal Grid */
+        .bias-banner { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 8px; margin-bottom: 15px; font-weight: 800; font-size: 1.1rem; }
+        .bias-bullish { background: rgba(14, 203, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .bias-bearish { background: rgba(246, 70, 93, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .bias-neutral { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .metric-box { background: var(--bg-hover); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); }
+        .metric-value { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+
+        .scenario-box { background: var(--bg-hover); border-left: 4px solid var(--accent-blue); padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 10px; font-size: 0.85rem; }
+        .scenario-box.bullish { border-left-color: var(--accent-green); }
+        .scenario-box.bearish { border-left-color: var(--accent-red); }
+
+        .disclaimer { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 15px; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">QUANT<span>ORA</span></div>
+        <div class="status-badge" id="api-status">API Connected</div>
+    </header>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('terminal')">Intelligence Terminal</button>
+            <button class="tab-btn" onclick="switchTab('chart')">Advanced Chart</button>
+            <button class="tab-btn" onclick="switchTab('strategy')">Strategy Builder</button>
+            <button class="tab-btn" onclick="switchTab('portfolio')">Paper Portfolio</button>
+        </div>
+
+        <!-- TAB 1: INTELLIGENCE TERMINAL -->
+        <div id="tab-terminal" class="tab-content active">
+            <div class="controls-grid">
+                <select id="sel-symbol" onchange="runAnalysis()">
+                    <option value="BTCUSDT">BTC / USDT</option>
+                    <option value="ETHUSDT">ETH / USDT</option>
+                    <option value="SOLUSDT">SOL / USDT</option>
+                    <option value="XRPUSDT">XRP / USDT</option>
+                </select>
+                <select id="sel-timeframe" onchange="runAnalysis()">
+                    <option value="15m">15 Minutes</option>
+                    <option value="1h" selected>1 Hour</option>
+                    <option value="4h">4 Hours</option>
+                    <option value="1d">1 Day</option>
+                </select>
+            </div>
+
+            <button class="primary" onclick="runAnalysis()" style="margin-bottom: 15px;">Run AI Market Intelligence</button>
+
+            <div id="analysis-results">
+                <div class="card">
+                    <p style="text-align: center; color: var(--text-muted);">Select symbol and tap 'Run AI Market Intelligence' to generate Deeepr.ai-style report.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: ADVANCED CHART -->
+        <div id="tab-chart" class="tab-content">
+            <div class="card">
+                <div class="card-title">Live Price Action</div>
+                <div id="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: STRATEGY BUILDER -->
+        <div id="tab-strategy" class="tab-content">
+            <div class="card">
+                <div class="card-title">Strategy Builder</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Configure custom multi-indicator rule sets for educational simulation.</p>
+            </div>
+        </div>
+
+        <!-- TAB 4: PAPER PORTFOLIO -->
+        <div id="tab-portfolio" class="tab-content">
+            <div class="card">
+                <div class="card-title">Virtual Paper Portfolio</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Track simulated trades based on Quantora scenario models.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://quantora-rele.onrender.com";
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(tabName === 'chart') { setTimeout(initChart, 200); }
+        }
+
+        async function runAnalysis() {
+            const symbol = document.getElementById('sel-symbol').value;
+            const timeframe = document.getElementById('sel-timeframe').value;
+            const container = document.getElementById('analysis-results');
+
+            container.innerHTML = `<div class="card"><p style="text-align: center; color: var(--text-muted);">Analyzing multi-timeframe liquidity and indicators...</p></div>`;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/analysis?symbol=${symbol}&timeframe=${timeframe}`);
+                const data = await res.json();
+
+                let biasClass = "bias-neutral";
+                if(data.market_bias === "BULLISH") biasClass = "bias-bullish";
+                if(data.market_bias === "BEARISH") biasClass = "bias-bearish";
+
+                container.innerHTML = `
+                    <div class="bias-banner ${biasClass}">
+                        <span>MARKET BIAS: ${data.market_bias}</span>
+                        <span style="font-size: 0.85rem;">$${data.price.toLocaleString()}</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Core Indicator Metrics</div>
+                        <div class="metrics-grid">
+                            <div class="metric-box">
+                                <div class="metric-label">RSI (14)</div>
+                                <div class="metric-value">${data.indicators.rsi.toFixed(1)}</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Volume Ratio</div>
+                                <div class="metric-value">${data.indicators.volume_ratio.toFixed(2)}x</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">EMA 20</div>
+                                <div class="metric-value">$${data.indicators.ema20.toFixed(2)}</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">EMA 200</div>
+                                <div class="metric-value">$${data.indicators.ema200.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Educational Scenarios</div>
+                        <div class="scenario-box bullish">
+                            <strong>Bullish Scenario</strong><br>
+                            Entry Zone: ${data.scenarios.bullish.entry_zone}<br>
+                            Target: ${data.scenarios.bullish.target} | Invalidation: ${data.scenarios.bullish.invalidation}<br>
+                            <em>${data.scenarios.bullish.note}</em>
+                        </div>
+                        <div class="scenario-box bearish">
+                            <strong>Bearish Scenario</strong><br>
+                            Entry Zone: ${data.scenarios.bearish.entry_zone}<br>
+                            Target: ${data.scenarios.bearish.target} | Invalidation: ${data.scenarios.bearish.invalidation}<br>
+                            <em>${data.scenarios.bearish.note}</em>
+                        </div>
+                    </div>
+
+                    <div class="disclaimer">${data.disclaimer}</div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div class="card"><p style="text-align: color: var(--accent-red);">Failed to connect to Quantora API backend.</p></div>`;
+            }
+        }
+
+        let chartInitialized = false;
+        function initChart() {
+            if (chartInitialized) return;
+            const container = document.getElementById('chart-container');
+            container.innerHTML = "";
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth,
+                height: 350,
+                layout: { background: { color: '#121824' }, textColor: '#9ca3af' },
+                grid: { vertLines: { color: '#1f293d' }, horzLines: { color: '#1f293d' } }
+            });
+            const candlestickSeries = chart.addCandlestickSeries();
+            
+            fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=100')
+                .then(res => res.json())
+                .then(data => {
+                    const formatted = data.map(d => ({
+                        time: d[0] / 1000,
+                        open: parseFloat(d[1]),
+                        high: parseFloat(d[2]),
+                        low: parseFloat(d[3]),
+                        close: parseFloat(d[4])
+                    }));
+                    candlestickSeries.setData(formatted);
+                    chart.timeScale().fitContent();
+                });
+            chartInitialized = true;
+        }
+
+        // Run initial analysis on load
+        window.onload = () => { runAnalysis(); };
+    </script>
+</body>
+</html>
