@@ -90,6 +90,7 @@
                     <option value="ETHUSDT">ETH / USDT</option>
                     <option value="SOLUSDT">SOL / USDT</option>
                     <option value="XRPUSDT">XRP / USDT</option>
+                    <option value="PAXGUSDT">PAXG / USDT (Gold)</option>
                 </select>
                 <select id="sel-timeframe" onchange="runAnalysis()">
                     <option value="15m">15 Minutes</option>
@@ -111,7 +112,7 @@
         <!-- TAB 2: ADVANCED CHART -->
         <div id="tab-chart" class="tab-content">
             <div class="card">
-                <div class="card-title">Live Price Action</div>
+                <div class="card-title"><span id="chart-title-text">Live Price Action</span></div>
                 <div id="chart-container"></div>
             </div>
         </div>
@@ -141,7 +142,10 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
             event.currentTarget.classList.add('active');
-            if(tabName === 'chart') { setTimeout(initChart, 200); }
+            if(tabName === 'chart') { 
+                const symbol = document.getElementById('sel-symbol').value;
+                setTimeout(() => initChart(symbol), 200); 
+            }
         }
 
         async function runAnalysis() {
@@ -234,20 +238,28 @@
             }
         }
 
+        let chart;
+        let candlestickSeries;
         let chartInitialized = false;
-        function initChart() {
-            if (chartInitialized) return;
+
+        function initChart(symbol = 'BTCUSDT') {
             const container = document.getElementById('chart-container');
-            container.innerHTML = "";
-            const chart = LightweightCharts.createChart(container, {
-                width: container.clientWidth,
-                height: 350,
-                layout: { background: { color: '#121824' }, textColor: '#9ca3af' },
-                grid: { vertLines: { color: '#1f293d' }, horzLines: { color: '#1f293d' } }
-            });
-            const candlestickSeries = chart.addCandlestickSeries();
+            document.getElementById('chart-title-text').innerText = `Live Price Action (${symbol})`;
             
-            fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=100')
+            if (!chartInitialized) {
+                container.innerHTML = "";
+                chart = LightweightCharts.createChart(container, {
+                    width: container.clientWidth,
+                    height: 350,
+                    layout: { background: { color: '#121824' }, textColor: '#9ca3af' },
+                    grid: { vertLines: { color: '#1f293d' }, horzLines: { color: '#1f293d' } }
+                });
+                candlestickSeries = chart.addCandlestickSeries();
+                chartInitialized = true;
+            }
+
+            const timeframe = document.getElementById('sel-timeframe').value;
+            fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${timeframe}&limit=100`)
                 .then(res => res.json())
                 .then(data => {
                     const formatted = data.map(d => ({
@@ -260,7 +272,6 @@
                     candlestickSeries.setData(formatted);
                     chart.timeScale().fitContent();
                 });
-            chartInitialized = true;
         }
 
         window.onload = () => { runAnalysis(); };
