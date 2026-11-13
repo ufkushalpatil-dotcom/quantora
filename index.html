@@ -159,10 +159,34 @@
                 if(data.market_bias === "BULLISH") biasClass = "bias-bullish";
                 if(data.market_bias === "BEARISH") biasClass = "bias-bearish";
 
+                const getConfluenceColor = (b) => b === 'BULLISH' ? 'var(--accent-green)' : (b === 'BEARISH' ? 'var(--accent-red)' : 'var(--accent-blue)');
+
                 container.innerHTML = `
                     <div class="bias-banner ${biasClass}">
                         <span>MARKET BIAS: ${data.market_bias}</span>
                         <span style="font-size: 0.85rem;">$${data.price.toLocaleString()}</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Multi-Timeframe Confluence</div>
+                        <div class="metrics-grid">
+                            <div class="metric-box">
+                                <div class="metric-label">15m Timeframe</div>
+                                <div class="metric-value" style="color: ${getConfluenceColor(data.confluence['15m'])}">${data.confluence['15m']}</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">1h Timeframe</div>
+                                <div class="metric-value" style="color: ${getConfluenceColor(data.confluence['1h'])}">${data.confluence['1h']}</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">4h Timeframe</div>
+                                <div class="metric-value" style="color: ${getConfluenceColor(data.confluence['4h'])}">${data.confluence['4h']}</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">1d Timeframe</div>
+                                <div class="metric-value" style="color: ${getConfluenceColor(data.confluence['1d'])}">${data.confluence['1d']}</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card">
@@ -206,7 +230,7 @@
                     <div class="disclaimer">${data.disclaimer}</div>
                 `;
             } catch (err) {
-                container.innerHTML = `<div class="card"><p style="text-align: color: var(--accent-red);">Failed to connect to Quantora API backend.</p></div>`;
+                container.innerHTML = `<div class="card"><p style="text-align: center; color: var(--accent-red);">Failed to connect to Quantora API backend.</p></div>`;
             }
         }
 
@@ -239,7 +263,6 @@
             chartInitialized = true;
         }
 
-        // Run initial analysis on load
         window.onload = () => { runAnalysis(); };
     </script>
 </body>
